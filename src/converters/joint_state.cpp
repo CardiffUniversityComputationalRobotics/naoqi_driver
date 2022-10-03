@@ -187,8 +187,8 @@ namespace naoqi
       msg_tf_odom.transform.translation.z = odomZ;
       msg_tf_odom.transform.rotation = odom_quat;
 
-      // tf_transforms_.push_back( msg_tf_odom );
-      // tf2_buffer_->setTransform( msg_tf_odom, "naoqiconverter", false);
+      tf_transforms_.push_back(msg_tf_odom);
+      tf2_buffer_->setTransform(msg_tf_odom, "naoqiconverter", false);
 
       if (robot_ == robot::NAO)
       {
