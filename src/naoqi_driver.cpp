@@ -178,6 +178,7 @@ namespace naoqi
 
   void Driver::rosLoop()
   {
+
     static std::vector<message_actions::MessageAction> actions;
 
     //  ros::Time::init();
@@ -781,6 +782,8 @@ namespace naoqi
       boost::shared_ptr<publisher::JointStatePublisher> jsp = boost::make_shared<publisher::JointStatePublisher>("/joint_states");
       boost::shared_ptr<recorder::JointStateRecorder> jsr = boost::make_shared<recorder::JointStateRecorder>("/joint_states");
       boost::shared_ptr<converter::JointStateConverter> jsc = boost::make_shared<converter::JointStateConverter>("joint_states", joint_states_frequency, tf2_buffer_, sessionPtr_);
+
+      jsc->setPublishOdomTf(publish_odom_tf_);
       jsc->registerCallback(message_actions::PUBLISH, boost::bind(&publisher::JointStatePublisher::publish, jsp, _1, _2));
       jsc->registerCallback(message_actions::RECORD, boost::bind(&recorder::JointStateRecorder::write, jsr, _1, _2));
       jsc->registerCallback(message_actions::LOG, boost::bind(&recorder::JointStateRecorder::bufferize, jsr, _1, _2));
@@ -991,6 +994,21 @@ namespace naoqi
   void Driver::setMasterURI(const std::string &uri)
   {
     setMasterURINet(uri, "eth0");
+  }
+
+  // odom pub
+  void Driver::setOdomTfPub(const bool pubOdom)
+  {
+    publish_odom_tf_ = pubOdom;
+
+    if (pubOdom)
+    {
+      publish_odom_tf_ = true;
+    }
+    else
+    {
+      publish_odom_tf_ = false;
+    }
   }
 
   void Driver::setMasterURINet(const std::string &uri, const std::string &network_interface)

@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 
 #ifndef JOINT_STATES_CONVERTER_HPP
 #define JOINT_STATES_CONVERTER_HPP
 
 /*
-* LOCAL includes
-*/
+ * LOCAL includes
+ */
 #include "converter_base.hpp"
 #include "../tools/robot_description.hpp"
 #include <naoqi_driver/message_actions.h>
 
 /*
-* ROS includes
-*/
+ * ROS includes
+ */
 #include <urdf/model.h>
 #include <sensor_msgs/JointState.h>
 #include <tf2_ros/buffer.h>
@@ -35,62 +35,65 @@
 
 namespace naoqi
 {
-namespace converter
-{
+  namespace converter
+  {
 
-class JointStateConverter : public BaseConverter<JointStateConverter>
-{
+    class JointStateConverter : public BaseConverter<JointStateConverter>
+    {
 
-  typedef boost::function<void(sensor_msgs::JointState&, std::vector<geometry_msgs::TransformStamped>&) > Callback_t;
+      typedef boost::function<void(sensor_msgs::JointState &, std::vector<geometry_msgs::TransformStamped> &)> Callback_t;
 
-  typedef boost::shared_ptr<tf2_ros::Buffer> BufferPtr;
+      typedef boost::shared_ptr<tf2_ros::Buffer> BufferPtr;
 
-  typedef std::map<std::string, urdf::JointMimicSharedPtr> MimicMap;
+      typedef std::map<std::string, urdf::JointMimicSharedPtr> MimicMap;
 
-public:
-  JointStateConverter( const std::string& name, const float& frequency, const BufferPtr& tf2_buffer, const qi::SessionPtr& session );
+    public:
+      JointStateConverter(const std::string &name, const float &frequency, const BufferPtr &tf2_buffer, const qi::SessionPtr &session);
 
-  ~JointStateConverter();
+      ~JointStateConverter();
 
-  virtual void reset( );
+      virtual void reset();
 
-  void registerCallback( const message_actions::MessageAction action, Callback_t cb );
+      void registerCallback(const message_actions::MessageAction action, Callback_t cb);
 
-  void callAll( const std::vector<message_actions::MessageAction>& actions );
+      void callAll(const std::vector<message_actions::MessageAction> &actions);
 
-private:
+      void setPublishOdomTf(const bool publish_odom_tf);
 
-  /** blatently copied from robot state publisher */
-  void addChildren(const KDL::SegmentMap::const_iterator segment);
-  std::map<std::string, robot_state_publisher::SegmentPair> segments_, segments_fixed_;
-  void setTransforms(const std::map<std::string, double>& joint_positions, const ros::Time& time, const std::string& tf_prefix);
-  void setFixedTransforms(const std::string& tf_prefix, const ros::Time& time);
+    private:
+      /** blatently copied from robot state publisher */
+      void addChildren(const KDL::SegmentMap::const_iterator segment);
+      std::map<std::string, robot_state_publisher::SegmentPair> segments_, segments_fixed_;
+      void setTransforms(const std::map<std::string, double> &joint_positions, const ros::Time &time, const std::string &tf_prefix);
+      void setFixedTransforms(const std::string &tf_prefix, const ros::Time &time);
 
-  /** Global Shared tf2 buffer **/
-  BufferPtr tf2_buffer_;
+      /** Global Shared tf2 buffer **/
+      BufferPtr tf2_buffer_;
 
-  /** Motion Proxy **/
-  qi::AnyObject p_motion_;
-  qi::AnyObject p_memory_;
+      /** Motion Proxy **/
+      qi::AnyObject p_motion_;
+      qi::AnyObject p_memory_;
 
-  /** Registered Callbacks **/
-  std::map<message_actions::MessageAction, Callback_t> callbacks_;
+      /** Registered Callbacks **/
+      std::map<message_actions::MessageAction, Callback_t> callbacks_;
 
-  /** Robot Description in xml format **/
-  std::string robot_desc_;
+      /** Robot Description in xml format **/
+      std::string robot_desc_;
 
-  /** MimicJoint List **/
-  MimicMap mimic_;
+      /** MimicJoint List **/
+      MimicMap mimic_;
 
-  /** JointState Message **/
-  sensor_msgs::JointState msg_joint_states_;
+      /** JointState Message **/
+      sensor_msgs::JointState msg_joint_states_;
 
-  /** Transform Messages **/
-  std::vector<geometry_msgs::TransformStamped> tf_transforms_;
+      /** Transform Messages **/
+      std::vector<geometry_msgs::TransformStamped> tf_transforms_;
 
-}; // class
+      bool publish_odom_tf_;
 
-} //publisher
+    }; // class
+
+  } // publisher
 } // naoqi
 
 #endif

@@ -187,8 +187,11 @@ namespace naoqi
       msg_tf_odom.transform.translation.z = odomZ;
       msg_tf_odom.transform.rotation = odom_quat;
 
-      tf_transforms_.push_back(msg_tf_odom);
-      tf2_buffer_->setTransform(msg_tf_odom, "naoqiconverter", false);
+      if (publish_odom_tf_)
+      {
+        tf_transforms_.push_back(msg_tf_odom);
+        tf2_buffer_->setTransform(msg_tf_odom, "naoqiconverter", false);
+      }
 
       if (robot_ == robot::NAO)
       {
@@ -205,6 +208,11 @@ namespace naoqi
       {
         callbacks_[action](msg_joint_states_, tf_transforms_);
       }
+    }
+
+    void JointStateConverter::setPublishOdomTf(const bool publish_odom_tf)
+    {
+      publish_odom_tf_ = publish_odom_tf;
     }
 
     // Copied from robot state publisher
